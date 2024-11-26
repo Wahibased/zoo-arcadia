@@ -1,0 +1,175 @@
+<?php
+session_start();
+// Vérifier si l'utilisateur est connecté
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Inclusion du fichier de vérification de l'authentification
+include '../auth/auth_check.php';
+?>
+
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/canvasjs/3.7.5/canvasjs.min.js"></script>
+    <title>Dashboard - Zoo Arcadia</title>
+</head>
+<body>
+    <h1>Bienvenue sur le tableau de bord <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/zoo-arcadia/index.php">Accueil</a></li>
+                <li><a href="/zoo-arcadia/logout.php">Se déconnecter</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="dashboard">
+            <h2>Tableau de Bord</h2>
+            <div class="dashboard-menu">
+                <a href="compte_rendu_vétérinaire.html" class="btn">Compte Rendu Vétérinaire</a>
+                <a href="gerer_utilisateurs.php" class="btn">Gérer Utilisateurs</a>
+                <a href="gere_avis.php" class="btn">Soumettre Avis Visiteur</a>
+                <a href="gere_services.html" class="btn">Services</a>
+                <a href="gere_habitat.php" class="btn">Habitat</a>
+            </div>
+        </section>
+
+        <section id="admin_dashboard">
+            <h3>Filtres des Comptes Rendus</h3>
+            <div class="filter-form">
+                <form method="GET" action="">
+                    <label for="animal">Animal:</label>
+                    <select id="animal" name="animal">
+                        <option value="">Tous</option>
+                        <option value="Grenouille des Marais">Grenouille des Marais</option>
+                        <option value="Flamants des Marais">Flamants des Marais</option>
+                        <option value="Alligator des Marais">Alligator des Marais</option>
+                        <option value="Aigrette des Marais">Aigrette des Marais</option>
+                        <option value="Lion">Lion de la Savane</option>
+                        <option value="Buffalo">Buffalo de la Savane</option>
+                        <option value="Girafe">Girafe de la Savane</option>
+                        <option value="Oryx">Oryx de la Savane</option>
+                        <option value="Suricate">Suricate de la Savane</option>
+                        <option value="Zèbre">Zèbre de la Savane</option>
+                        <option value="Lézard">Lézard de la Jungle</option>
+                        <option value="Tigre">Tigre de la Jungle</option>
+                        <option value="Toucan">Toucan de la Jungle</option>
+                        <option value="Python">Python de la Jungle</option>
+                    </select>
+
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" name="date">
+
+                    <button type="submit" class="btn">Filtrer</button>
+                </form>
+            </div>
+
+            <div class="reports">
+                <h3>Comptes Rendus</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom de l'Utilisateur</th>
+                            <th>Nom de l'Animal</th>
+                            <th>État de l'Animal</th>
+                            <th>Nourriture Proposée</th>
+                            <th>Grammage</th>
+                            <th>Avis</th>
+                            <th>Date de l'Examen</th>
+                          
+                        </tr>
+                    </thead>
+                    <tbody id="reports-data">
+                        <!-- Les données PHP seront injectées ici via javascript-->
+                    </tbody>
+                     
+                </table>
+            </div>
+
+            <div class="statistics">
+                <h3>Statistiques des Consultations</h3>
+                <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+                <canvas id="statsCanvas" width="400" height="200"></canvas>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Zoo Arcadia. Tous droits réservés.</p>
+    </footer>
+
+    <script>
+      $(document).ready(function () {
+    // Fonction pour charger les données
+    function loadReports(filters = {}) {
+        $.ajax({
+            url: 'fetch_reports.php',
+            method: 'GET',
+            data: filters, // Envoyer les filtres comme paramètres GET
+            success: function (data) {
+                $('#reports-data').html(data); // Injecter les données dans le tableau
+            },
+            error: function () {
+                $('#reports-data').html('<tr><td colspan="8">Erreur lors du chargement des données.</td></tr>');
+            }
+        });
+    }
+
+    // Charger les données initiales (sans filtre)
+    loadReports();
+
+    // Gérer l'envoi du formulaire de filtre
+    $('#filter-form').on('submit', function (e) {
+        e.preventDefault(); // Empêcher le rechargement de la page
+
+        // Récupérer les valeurs des filtres
+        const animal = $('#animal').val();
+        const date = $('#date').val();
+
+        // Charger les données avec les filtres
+        loadReports({ animal: animal, date: date });
+    });
+});
+
+
+        // Fonction pour récupérer les données d'incrémentation
+        fetch('http://localhost:3009/Increments')
+            .then(response => response.json())
+            .then(data => {
+                const increments = data.increments;
+                const statsData = increments.map(increment => ({
+                    label: increment.animalId.name,  // Nom de l'animal
+                    y: increment.incrementCount  // Nombre d'incréments
+                }));
+
+                // Créer un graphique avec CanvasJS
+                const chart = new CanvasJS.Chart("statsCanvas", {
+                    animationEnabled: true,
+                    theme: "light2",
+                    title: {
+                        text: "Nombre de consultations par animal"
+                    },
+                    axisY: {
+                        title: "Consultations"
+                    },
+                    data: [{
+                        type: "column",
+                        dataPoints: statsData
+                    }]
+                });
+
+                // Afficher le graphique
+                chart.render();
+            })
+            .catch(error => console.error('Erreur lors de la récupération des statistiques :', error));
+    </script>
+</body>
+</html>
