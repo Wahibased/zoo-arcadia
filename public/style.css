@@ -228,7 +228,7 @@ section {
 }
 /*hero*/
 .hero {
-  background-image: url('/public/image/hero.jpg');
+  background-image: url('/image/hero.jpg');
   background-size: cover;
   height: 75vh;
   display: flex;
@@ -512,17 +512,17 @@ h2 {
 
 
 #marais {
-  background-image: url('/public/image/istockphoto-184272941-1024x1024.jpg');
+  background-image: url('/image/istockphoto-184272941-1024x1024.jpg');
   color: #fff;
 }
 
 #savne {
-  background-image: url('/public/image/istockphoto-177145956-1024x1024.jpg');
+  background-image: url('/image/istockphoto-177145956-1024x1024.jpg');
   color: #fff;
 }
 
 #jungle {
-  background-image: url('/public/image/istockphoto-184272941-1024x1024.jpg');
+  background-image: url('/image/istockphoto-184272941-1024x1024.jpg');
   color: #fff;
 }
 

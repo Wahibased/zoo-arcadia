@@ -9,7 +9,7 @@
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
         <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
-        <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" href="/style.css" />
     <title>zoo arcadia</title>
    <!-- header -->
    <header class="header">
@@ -130,12 +130,18 @@
     <h2>Avis des visiteurs</h2>
     <div id="approvedComments" class="carousel">
         <?php
+       $host = xefi550t7t6tjn36.cbetxkdyhwsb.us-east-1.rds.amazonaws.com;
+         $Port =3306;
+         $user= smcjf3rv6c0r3x52;
+         $password = g1pwk9sdxcz55ki2;
+         $dbname =lk6admexwuwqufr8;
+        /*
         // Connexion à la base de données
         $servername = "localhost";
         $username = "root"; // Ajustez selon votre configuration
         $password = "";     // Ajustez selon votre configuration
         $dbname = "zoo_arcadia"; // Nom de votre base de données
-
+*/
         // Création de la connexion
         $conn = new mysqli($servername, $username, $password, $dbname);
 
