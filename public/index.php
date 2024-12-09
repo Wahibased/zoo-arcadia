@@ -3,7 +3,7 @@
 session_start();
 
 // Inclusion d'une bibliothèque pour la gestion des requêtes sécurisées (si nécessaire)
-require_once('db_connection.php'); // Assurez-vous d'avoir un fichier de connexion à la base de données.
+require_once('/public/config/db.php'); // Assurez-vous d'avoir un fichier de connexion à la base de données.
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Assainir les entrées
