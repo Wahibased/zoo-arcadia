@@ -23,4 +23,3 @@ if ($username === $valid_username && $password === $valid_password) {
     header("Location: index.html"); // Redirection vers la page de connexion
     exit;
 }
-?>

@@ -34,3 +34,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+document.querySelector('.login-form').addEventListener('submit', function (event) {
+    const username = document.querySelector('[name="username"]').value.trim();
+    const password = document.querySelector('[name="password"]').value.trim();
+
+    if (!username || !password) {
+        alert('Veuillez remplir tous les champs.');
+        event.preventDefault();
+    }
+});

@@ -67,6 +67,29 @@ $avis = $conn->query("SELECT * FROM avis_visiteurs ORDER BY created_at DESC");
         </tr>
         <?php } ?>
     </table>
+    <script>
+document.querySelectorAll('.action-link').forEach(link => {
+    link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const url = this.href;
+
+        fetch(url, { method: 'GET' })
+            .then(response => response.text())
+            .then(data => {
+                if (data.trim() === 'success') {
+                    alert("Action effectuée avec succès !");
+                    location.reload(); // Recharge pour mettre à jour la liste
+                } else {
+                    alert("Erreur lors de l'exécution de l'action.");
+                }
+            })
+            .catch(error => {
+                console.error('Erreur AJAX :', error);
+                alert("Une erreur est survenue.");
+            });
+    });
+});
+</script>
 
 </body>
 </html>

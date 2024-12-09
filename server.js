@@ -15,8 +15,7 @@ app.use(bodyParser.json());
 
 // Connexion à MongoDB Atlas
 mongoose.connect('mongodb+srv://wahiba1988:wahiba1988@cluster0.uju72.mongodb.net/zoodb', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
+ 
 })
   .then(() => console.log('Connecté à MongoDB Atlas'))
   .catch((error) => console.log('Erreur de connexion à MongoDB:', error));

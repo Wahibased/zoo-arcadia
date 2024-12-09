@@ -1,163 +1,215 @@
 <?php
-// Paramètres de connexion
-$host = 'localhost';
-$dbname = 'zoo_arcadia';
-$user = 'root';
-$password = '';
+// Affichage des erreurs pour le débogage
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
+// Connexion à la base de données
 try {
-    // Connexion à la base de données avec PDO
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $password);
+    $pdo = new PDO('mysql:host=localhost;dbname=zoo_arcadia', 'root', '');
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    // Exemple de récupération des habitats et des animaux
-    $stmt = $pdo->query('SELECT * FROM habitats');
-    $habitats = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    foreach ($habitats as &$habitat) {
-        $stmtAnimals = $pdo->prepare('SELECT * FROM animals WHERE habitat_id = ?');
-        $stmtAnimals->execute([$habitat['id']]);
-        $habitat['animals'] = $stmtAnimals->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    // Maintenant, $habitats contient les données pour la page.
 } catch (PDOException $e) {
-    die("Erreur de connexion : " . $e->getMessage());
+    die('Erreur de connexion à la base de données : ' . $e->getMessage());
+}
+
+// Action à exécuter
+$action = $_GET['action'] ?? $_POST['action'] ?? '';
+
+if ($action === 'save') {
+    try {
+        $id = $_POST['id'] ?? null;
+        $nom = $_POST['nom'] ?? '';
+        $race = $_POST['race'] ?? '';
+        $habitat_id = $_POST['habitat'] ?? '';
+        $imagePath = null;
+
+        // Gestion du téléchargement de l'image
+        if (isset($_FILES['animalImage']) && $_FILES['animalImage']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = "dashboard/uploads/"; // Chemin du dossier d'upload
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true); // Crée le dossier s'il n'existe pas
+            }
+
+            // Générez un nom unique pour l'image
+            $fileExtension = pathinfo($_FILES['animalImage']['name'], PATHINFO_EXTENSION);
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+            if (in_array(strtolower($fileExtension), $allowedExtensions)) {
+                $imageName = uniqid('animal_', true) . '.' . $fileExtension;
+                $targetPath = $uploadDir . $imageName; // Chemin complet du fichier
+
+                if (move_uploaded_file($_FILES['animalImage']['tmp_name'], $targetPath)) {
+                    $imagePath = $targetPath; // Enregistrer le chemin pour la base de données
+                } else {
+                    throw new Exception("Erreur lors du déplacement de l'image vers le dossier.");
+                }
+            } else {
+                throw new Exception("Extension de fichier non autorisée.");
+            }
+        }
+
+        if ($id) {
+            // Mise à jour
+            $stmt = $pdo->prepare('UPDATE animaux SET nom = ?, race = ?, habitat_id = ?, image_path = ? WHERE id = ?');
+            $stmt->execute([$nom, $race, $habitat_id, $imagePath, $id]);
+        } else {
+            // Insertion
+            $stmt = $pdo->prepare('INSERT INTO animaux (nom, race, habitat_id, image_path) VALUES (?, ?, ?, ?)');
+            $stmt->execute([$nom, $race, $habitat_id, $imagePath]);
+        }
+
+        echo json_encode(['status' => 'success', 'message' => 'Animal enregistré avec succès']);
+    } catch (Exception $e) {
+        echo json_encode(['status' => 'error', 'message' => 'Erreur : ' . $e->getMessage()]);
+    }
+    exit;
+}
+
+if ($action === 'load') {
+    $stmt = $pdo->query('
+        SELECT a.id, a.nom, a.race, h.nom AS habitat, a.image_path, a.consultation_count
+        FROM animaux a
+        JOIN habitats h ON a.habitat_id = h.id
+    ');
+    echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+    exit;
+}
+
+if ($action === 'edit') {
+    $id = $_GET['id'] ?? null;
+    if ($id) {
+        $stmt = $pdo->prepare('SELECT * FROM animaux WHERE id = ?');
+        $stmt->execute([$id]);
+        echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
+    }
+    exit;
+}
+
+if ($action === 'delete') {
+    $id = $_GET['id'] ?? null;
+    if ($id) {
+        $stmt = $pdo->prepare('DELETE FROM animaux WHERE id = ?');
+        $stmt->execute([$id]);
+    }
+    exit;
+}
+
+if ($action === 'consult') {
+    $id = $_GET['id'] ?? null;
+    if ($id) {
+        $stmt = $pdo->prepare('UPDATE animaux SET consultation_count = consultation_count + 1 WHERE id = ?');
+        $stmt->execute([$id]);
+    }
+    exit;
 }
 ?>
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Animaux</title>
     <link rel="stylesheet" href="style.css">
-    <title>Habitats</title>
 </head>
 <body>
-<header> 
-    <h1>Exploration nos Habitats</h1>
-</header>
+    <div class="container">
+        <h1>Gestion des Animaux</h1>
+        <form action="" id="animal-form" enctype="multipart/form-data">
+            <input type="hidden" id="animal-id" name="id">
+            <label for="nom">Nom :</label>
+            <input type="text" id="nom" name="nom" required>
 
-<!-- Bouton pour ajouter un nouvel habitat -->
-<button onclick="showAddHabitatForm()">Ajouter un nouvel habitat</button>
+            <label for="race">Race :</label>
+            <input type="text" id="race" name="race" required>
 
-<!-- Formulaire pour ajouter un nouvel habitat (initialement caché) -->
-<div id="addHabitatForm" style="display: none;">
-    <h3>Ajouter un nouvel habitat</h3>
-    <form onsubmit="addHabitat(event)">
-        <input type="text" name="habitatName" placeholder="Nom de l'habitat" required>
-        <button type="submit">Ajouter</button>
-    </form>
-</div>
+            <label for="habitat">Habitat :</label>
+            <select id="habitat" name="habitat" required>
+                <option value="1">Marais</option>
+                <option value="2">Savane</option>
+                <option value="3">Jungle</option>
+            </select>
 
-<?php
-// Simulation de données pour les habitats et animaux (remplacez cela par vos données réelles provenant d'une base de données)
-$habitats = [
-    [
-        'id' => 1,
-        'name' => 'marai',
-        'animals' => [
-            ['id' => 1, 'name' => 'Lion', 'race' => 'Panthère', 'state' => 'En bonne santé', 'image' => 'lion.jpg'],
-            ['id' => 2, 'name' => 'Éléphant', 'race' => 'Loxodonta', 'state' => 'En bonne santé', 'image' => 'elephant.jpg'],
-        ]
-    ],
-    [
-        'id' => 2,
-        'name' => 'jungle ',
-        'animals' => [
-            ['id' => 1, 'name' => 'Toucan', 'race' => 'Ramphastidae', 'state' => 'En bonne santé', 'image' => 'toucan.jpg'],
-            ['id' => 2, 'name' => 'Jaguar', 'race' => 'Panthera', 'state' => 'En bonne santé', 'image' => 'jaguar.jpg'],
-        ]
-        ],
-    [
-        'id' => 3,
-        'name' => 'savane',
-        'animals' => [
-            ['id' => 1, 'name' => 'Toucan', 'race' => 'Ramphastidae', 'state' => 'En bonne santé', 'image' => 'toucan.jpg'],
-            ['id' => 2, 'name' => 'Jaguar', 'race' => 'Panthera', 'state' => 'En bonne santé', 'image' => 'jaguar.jpg'],
-        ]
-    ]
-];
-?>
-
-<!-- Boucle pour chaque habitat -->
-<?php foreach ($habitats as $habitat): ?>
-<div class="habitat">
-    <h2><?php echo htmlspecialchars($habitat['name']); ?></h2>
-    <button onclick="editHabitat('<?php echo $habitat['id']; ?>')">Modifier</button>
-    <button onclick="deleteHabitat('<?php echo $habitat['id']; ?>')">Supprimer</button>
-
-    <!-- Bouton pour ajouter un nouvel animal -->
-    <button onclick="showAddAnimalForm('<?php echo $habitat['id']; ?>')">Ajouter un animal</button>
-
-    <!-- Formulaire pour ajouter un nouvel animal (initialement caché) -->
-    <div id="addAnimalForm-<?php echo $habitat['id']; ?>" style="display: none;">
-        <h3>Ajouter un nouvel animal</h3>
-        <form onsubmit="addAnimal(event, '<?php echo $habitat['id']; ?>')">
-            <input type="text" name="animalName" placeholder="Nom de l'animal" required>
-            <input type="text" name="animalRace" placeholder="Race de l'animal" required>
-            <input type="text" name="animalState" placeholder="État de l'animal" required>
-            <input type="file" name="animalImage" accept="image/*" required>
-            <button type="submit">Ajouter</button>
+            <label for="animalImage">Image :</label>
+            <input type="file" id="animalImage" name="animalImage" accept="image/*">
+            <button type="submit">Enregistrer</button>
         </form>
+
+        <h2>Liste des Animaux</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Race</th>
+                    <th>Habitat</th>
+                    <th>Image</th>
+                    <th>Consultations</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="animals-table-body"></tbody>
+        </table>
     </div>
 
-    <!-- Boucle pour chaque animal dans l'habitat -->
-    <?php foreach ($habitat['animals'] as $animal): ?>
-    <div class="animal-card" id="animal-<?php echo $habitat['id']; ?>-<?php echo $animal['id']; ?>" onclick="incrementCounter('<?php echo $habitat['id']; ?>', '<?php echo $animal['id']; ?>')">
-        <img src="<?php echo htmlspecialchars($animal['image']); ?>" alt="<?php echo htmlspecialchars($animal['name']); ?>">
-        <p>Nom: <?php echo htmlspecialchars($animal['name']); ?></p>
-        <p>Race: <?php echo htmlspecialchars($animal['race']); ?></p>
-        <p>Habitat: <?php echo htmlspecialchars($habitat['name']); ?></p>
-        <p>État: <span id="state-<?php echo $habitat['id']; ?>-<?php echo $animal['id']; ?>"><?php echo htmlspecialchars($animal['state']); ?></span></p>
-        <p>Consultations: <span id="counter-<?php echo $habitat['id']; ?>-<?php echo $animal['id']; ?>">0</span></p>
-        <p><strong>Avis du Vétérinaire :</strong> <p><strong>Avis du Vétérinaire :</strong><?php echo !empty($animal['vet_advice'])  ? htmlspecialchars($animal['vet_advice']) 
-            : 'Aucun avis disponible';   ?>
-        <button onclick="editAnimal('<?php echo $habitat['id']; ?>', '<?php echo $animal['id']; ?>')">Modifier</button>
-        <button onclick="deleteAnimal('<?php echo $habitat['id']; ?>', '<?php echo $animal['id']; ?>')">Supprimer</button>
-    </div>
-    <?php endforeach; ?>
-</div>
-<?php endforeach; ?>
+    <script>
+        const form = document.getElementById('animal-form');
+        const animalsTableBody = document.getElementById('animals-table-body');
 
-<footer>
-    <p>&copy; 2024 Zoo Arcadia. Tous droits réservés.</p>
-</footer>
+        const loadAnimals = () => {
+            fetch('?action=load')
+                .then(res => res.json())
+                .then(data => {
+                    animalsTableBody.innerHTML = '';
+                    data.forEach(animal => {
+                        animalsTableBody.innerHTML += `
+                            <tr>
+                                <td>${animal.nom}</td>
+                                <td>${animal.race}</td>
+                                <td>${animal.habitat}</td>
+                                <td><img src="${animal.image_path}" alt="Image" width="50"></td>
+                                <td>${animal.consultation_count}</td>
+                                <td>
+                                    <button onclick="editAnimal(${animal.id})">Modifier</button>
+                                    <button onclick="deleteAnimal(${animal.id})">Supprimer</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                });
+        };
 
-<script>
-    function showAddHabitatForm() {
-        document.getElementById('addHabitatForm').style.display = 'block';
-    }
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            fetch('?action=save', {
+                method: 'POST',
+                body: formData
+            }).then(res => res.json())
+              .then(data => {
+                  alert(data.message);
+                  loadAnimals();
+                  form.reset();
+              });
+        });
 
-    function addHabitat(event) {
-        event.preventDefault();
-        console.log('Ajouter habitat');
-    }
+        const editAnimal = id => {
+            fetch(`?action=edit&id=${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('animal-id').value = data.id;
+                    document.getElementById('nom').value = data.nom;
+                    document.getElementById('race').value = data.race;
+                    document.getElementById('habitat').value = data.habitat_id;
+                });
+        };
 
-    function editHabitat(habitatId) {
-        console.log('Modifier habitat', habitatId);
-    }
+        const deleteAnimal = id => {
+            if (confirm('Confirmer la suppression ?')) {
+                fetch(`?action=delete&id=${id}`).then(() => loadAnimals());
+            }
+        };
 
-    function deleteHabitat(habitatId) {
-        console.log('Supprimer habitat', habitatId);
-    }
-
-    function showAddAnimalForm(habitatId) {
-        document.getElementById(`addAnimalForm-${habitatId}`).style.display = 'block';
-    }
-
-    function addAnimal(event, habitatId) {
-        event.preventDefault();
-        console.log('Ajouter animal à l\'habitat', habitatId);
-    }
-
-    function editAnimal(habitatId, animalId) {
-        console.log('Modifier animal', habitatId, animalId);
-    }
-
-    function deleteAnimal(habitatId, animalId) {
-        console.log('Supprimer animal', habitatId, animalId);
-    }
-</script>
+        document.addEventListener('DOMContentLoaded', loadAnimals);
+    </script>
 </body>
 </html>

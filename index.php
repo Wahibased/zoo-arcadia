@@ -1,25 +1,475 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Feuilles de style -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="">
+    
+    <title>Zoo Arcadia</title>
+</head>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap');
 
- <link rel="stylesheet"  href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
-      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-        <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
-        <link rel="stylesheet" href="assets/style.css" />
-    <title>zoo arcadia</title>
-   <!-- header -->
-   <header class="header">
-        <a href="#" class="logo"><img src="assets/image/logo.jpg" alt="Logo" /></a>
+:root {
+  --main: #006666;
+  --bg: #ffffff;
+  --black: #141414;
+  --white: #ffffff;
+  --box-shadow: 0 .5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+* {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+  border: none;
+  text-decoration: none;
+  text-transform: capitalize;
+  transition: .2s linear;
+}
+
+html {
+  font-size: 62.5%;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  scroll-padding-top: 4rem;
+}
+
+html::-webkit-scrollbar {
+  width: 1rem;
+}
+
+html::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html::-webkit-scrollbar-thumb {
+  background: var(--main);
+  border-radius: 5rem;
+}
+
+body {
+  background: var(--bg);
+  color: var(--black);
+}
+
+section {
+  margin-bottom: 0;
+  background-color: #D9D9D9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 7%;
+  background: transparent;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-shadow: var(--box-shadow);
+}
+
+.header .logo img {
+  max-height: 50px;
+  max-width: 100%; 
+}
+
+
+.navbar {
+  display: none;
+  
+}
+.navbar.active {
+  display: block;
+}
+.navbar ul {
+ display: flex;
+  list-style: none;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar ul li {
+  margin: 0 1rem;
+}
+
+.navbar ul li a {
+  color: var(--white);
+  font-size: 1.8rem;
+}
+.navbar ul li a:hover {
+  color:var(--main)
+}
+.icons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 1rem;
+
+}
+.icons div {
+  margin-left: 1rem;
+  font-size: 2rem;
+  cursor: pointer;
+  color: var(--white);
+ 
+}
+
+.icons div:hover {
+  color:var(--main)
+}
+.login-form {
+  display: none ;
+  flex-direction: column;
+  background: var(--bg);
+  padding: 2rem;
+  box-shadow: var(--box-shadow);
+  border-radius: 0.5rem;
+  position:absolute;
+  top: 10rem;
+  right: 2rem;
+  z-index: 1001;
+}
+
+.login-form.hidden {
+  display: none;
+}
+.login-form.active {
+  display: flex;
+  right: 2rem;
+  transition: .4s linear;
+}
+
+.login-form h3 {
+  color: var(--main);
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.login-form .box {
+  width: 100%;
+  padding: 1rem;
+  margin: 1rem 0;
+  font-size: 1.6rem;
+  border-radius: 0.5rem;
+  background: var(--white);
+  color: var(--black);
+}
+
+.login-form .remember {
+  display: flex;
+  align-items: center;
+  color: var(--black);
+}
+
+.login-form .remember input {
+  margin-right: 0.5rem;
+}
+
+.login-form .btn {
+  font-size: 1.7rem;
+  display: inline-block;
+ background: var(--main);
+  color: var(--white);
+  box-shadow: var(--box-shadow);
+  border-radius: 5rem;
+  padding: 0.9rem 3rem;
+  margin-top: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-form .btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  background: #004d4d;
+  z-index: -1;
+  transition: .3s linear;
+  left: 0;
+}
+
+.login-form .btn:hover::before {
+  width: 100%;
+}
+
+
+
+@media (max-width: 768px) {
+    .navbar ul {
+        display: none;
+        flex-direction: column;
+        background: var(--bg);
+        position: fixed;
+        top: 4rem;
+        right: 2rem;
+        width: 200px;
+        border-radius: 0.5rem;
+        box-shadow: var(--box-shadow);
+    }
+   /* .navbar {
+      display: block; 
+  }*/
+  .navbar ul {
+      display: flex;
+  }
+
+    .navbar ul.active {
+        display: flex;
+    }
+ .navbar ul li {
+        margin: 1rem 0;
+        text-align: right;
+    }
+ .header {
+        justify-content: space-between;
+    }
+}
+/*hero*/
+.hero {
+  background-image: url('/zoo-arcadia/assets/image/hero.jpg');
+  background-size: cover;
+  height: 85vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.hero-content h1 {
+  color: white;
+  font-size: 2.4rem;
+}
+
+.hero-content p {
+  color: white;
+  font-size: 1.4rem;
+}
+
+.btn {
+  font-size: 1.7rem;
+  display: inline-block;
+  background: var(--main);
+  color: var(--white);
+  box-shadow: var(--box-shadow);
+  border-radius: 5rem;
+  padding: 0.9rem 3rem;
+  margin-top: 1rem;
+  position: relative;
+  color: #ffffff;
+}
+
+.btn:hover {
+  background-color: #004040;
+}
+
+@media (max-width: 768px) {
+  .navbar ul {
+    display: none;
+    flex-direction: column;
+    background: var(--bg);
+    position: fixed;
+    top: 8rem;
+    right: 2rem;
+    width: 200px;
+    border-radius: 0.5rem;
+    box-shadow: var(--box-shadow);
+  }
+
+  .navbar ul.active {
+    display: flex;
+  }
+
+  .navbar ul li {
+    margin: 1rem 0;
+    text-align: right;
+  }
+
+  .header {
+    justify-content: space-between;
+  }
+
+  .hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .hero-content p {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-content h1 {
+    font-size: 1.8rem;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+  }
+}
+/* presentation html*/
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 20px;
+}
+
+header {
+  background: #006666;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 2.8rem;
+  color: var(--white);
+}
+
+header p {
+  font-size: 1.6rem;
+}
+
+main {
+  padding: 20px 0;
+}
+
+#presentation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+}
+
+.presentation-content {
+  max-width: 800px;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.presentation-content h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #141414;
+}
+
+.presentation-content p {
+  font-size: 1.20rem;
+  margin-bottom: 20px;
+}
+
+.presentation-album {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 40px;
+}
+
+.presentation-album figure {
+  margin: 0;
+}
+
+.presentation-album img {
+  width: 100%;
+  display: block;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.presentation-album figcaption {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.card-container {
+  display: flex;
+  overflow-x: auto;
+  margin-bottom: 10px;
+  justify-content: center;
+}
+/* Section Footer */
+.footer {
+  background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center
+}
+
+.footer .box-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    /*gap: 0px;*/
+}
+
+.footer .box {
+    flex: 1 1 80px;
+    margin: 5px;
+}
+
+.footer .box h3 {
+    font-size: 1.70em;
+    margin-bottom: 10px;
+    color: #f9c846;
+}
+
+.footer .box p,
+.footer .box a {
+    font-size: 1.20em;
+    color: #ddd;
+    text-decoration: none;
+}
+
+.footer .box a:hover {
+    color: #f9c846;
+}
+
+/* Style spécifique pour la carte */
+.footer .box iframe {
+    width: 100%; /* Rend la carte responsive */
+    max-width: 200px; /* Limite la taille maximale */
+    height: 100px; /* Réduit la hauteur */
+    border: none;
+    margin: auto;
+    display: block;
+}
+
+/* Section des crédits */
+.footer .credit {
+    margin-top: 10px;
+    font-size: 0.8em;
+    color: #ccc;
+}
+</style>
+
+
+  <body>
+    <!-- Header -->
+    <header class="header">
+        <a href="#" class="logo"><img src="assets/image/logo.jpg" alt="Logo"></a>
         <nav class="navbar">
             <ul>
-                <li><a href="#Services"> Services</a></li>
-                <li><a href="#habitats">Habitats</a></li>
-                <li><a href="#avis">Avis</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="template/services.php">Services</a></li>
+                <li><a href="template/habitat.php">Habitats</a></li>
+                <li><a href="avis.php">Avis</a></li>
+                <li><a href="contact.php">Contact</a></li>
             </ul>
         </nav>
         <div class="icons">
@@ -28,22 +478,22 @@
         </div>
         <form action="login.php" method="post" class="login-form">
             <h3>Login Admin</h3>
-            <input type="text" placeholder="Nom d'utilisateur / Email" name="username" class="box" required />
-            <input type="password" placeholder="Mot de passe" name="password" class="box" required />
+            <input type="text" placeholder="Nom d'utilisateur / Email" name="username" class="box" required>
+            <input type="password" placeholder="Mot de passe" name="password" class="box" required>
             <div class="remember">
-                <input type="checkbox" name="remember" id="remember-me" />
+                <input type="checkbox" name="remember" id="remember-me">
                 <label for="remember-me">Se souvenir de moi</label>
             </div>
             <button type="submit" class="btn">Connexion</button>
+            
             <?php
-    session_start();
-    if (isset($_SESSION['error'])): ?>
-        <p style="color: red;"><?php echo htmlspecialchars($_SESSION['error'], ENT_QUOTES, 'UTF-8'); ?></p>
-        <?php unset($_SESSION['error']); ?>
-    <?php endif; ?>
+            if (isset($_SESSION['error'])): ?>
+                <p style="color: red;"><?php echo htmlspecialchars($_SESSION['error'], ENT_QUOTES, 'UTF-8'); ?></p>
+              <?php unset($_SESSION['error']); ?>
+            <?php endif; ?>
         </form>
-    </header> 
-    <!--hero-->
+    </header>
+ <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
             <h1>Bienvenue à Zoo Arcadia</h1>
@@ -51,176 +501,34 @@
             <a href="template/presentation.html" class="btn">Explorer</a>
         </div>
     </section>
-    <body>
-<!--services-->
-<section class="services">
-    <h2>Nos Services</h2>
-    <div class="card-container">
-        <div class="card">
-            <img src="assets/image/visiteguide.jpg" alt="Image 1">
-            <div class="card-content">
-                <h3><a href="">Visite Guidée</a></h3>
-                <p>Découvrez la région avec nos visites guidées expertes.</p>
-                <a href="template/services.php" class="card-link">Voir plus</a>
+
+    <!-- Footer -->
+    <section class="footer">
+        <div class="box-container">
+            <div class="box">
+                <h3><i class="fas fa-paw"></i> Horaires de Zoo Arcadia</h3>
+              
+                <p class="links"><i class="fas fa-clock"></i> Lundi-Dimanche</p>
+                <p class="days">8:00AM - 21:00PM</p>
+            </div>
+            <div class="box">
+                <h3>Nos contacts</h3>
+                <a href="#" class="links"><i class="fas fa-phone"></i> 01.22.44.55.20</a>
+                <a href="#" class="links"><i class="fas fa-envelope"></i> info@zooArcadia.com</a>
+                <a href="#" class="links"><i class="fas fa-map-marker-alt"></i> Brocéliande, Bretagne</a>
+            </div>
+            <div class="box">
+                <h3>Arcadia Carte</h3>
+                <iframe src="https://www.google.com/maps/d/embed?mid=1RMFibnDTskUEdjpGRdaZxDwle3AvHWo&ehbc=2E312F" width="400" height="280"></iframe>
             </div>
         </div>
-        <div class="card">
-            <img src="assets/image/restaurant.jpg" alt="Image 2">
-            <div class="card-content">
-                <h3><a href="">Restaurant</a></h3>
-                <p>Profitez de nos délicieux plats gastronomiques .</p>
-                <a href="template/services.php" class="card-link">Voir plus</a>
-            </div>
+        <div class="credit">
+            &copy; 2024 Zoo Arcadia.
         </div>
-        <div class="card">
-            <img src="assets/image/train.jpg" alt="Image 3">
-            <div class="card-content">
-                <h3><a href="">visite en train</a></h3>
-                <p>Voyagez confortablement avec notre service de transport en train.</p>
-                <a href="template/services.php" class="card-link">Voir plus</a>
-            </div>
-        </div>
-    </div>
-    
-   </section> 
-<!-- Section Habitats -->
-<section id="habitats" class="habitats">
-    <div class="container">
-        <h2>Nos Habitats</h2>
-        <div class="habitat-cards">
-            <a href="template/habitat.html" class="habitat-link">
-                <div class="habitat-card" id="marais">
-                    <h3>Marais</h3>
-                </div>
-            </a>
-            <a href="template/habitat.html" class="habitat-link">
-                <div class="habitat-card" id="savane">
-                    <h3>Savane</h3>
-                </div>
-            </a>
-            <a href="template/habitat.html" class="habitat-link">
-                <div class="habitat-card" id="jungle">
-                    <h3>Jungle</h3>
-                </div>
-            </a>
-        </div>
-    </div>
-</section>
-<!--avis-->
-<section id="avis-section">
-    <div class="container">
-        <!-- Bloc pour laisser un avis -->
-        <div class="form-block">
-            <h1>Laissez un avis</h1>
-            <form id="commentForm" action="dashboard/submit_avis.php" method="post">
-                <label for="pseudo">Pseudo:</label>
-                <input type="text" id="pseudo" name="pseudo" required>
+    </section>
 
-                <label for="avis">Votre avis:</label>
-                <textarea id="avis" name="avis" rows="5" required></textarea>
-
-                <button type="submit" class="btn-medium">Soumettre</button>
-            </form>
-        </div>
-
-       <!-- Bloc pour afficher les avis approuvés -->
-<div class="comments-block">
-    <h2>Avis des visiteurs</h2>
-    <div id="approvedComments" class="carousel">
-        <?php
-        // Connexion à la base de données
-        $servername = "localhost";
-        $username = "root"; // Ajustez selon votre configuration
-        $password = "";     // Ajustez selon votre configuration
-        $dbname = "zoo_arcadia"; // Nom de votre base de données
-
-        // Création de la connexion
-        $conn = new mysqli($servername, $username, $password, $dbname);
-
-        // Vérifier la connexion
-        if ($conn->connect_error) {
-            die("La connexion a échoué : " . $conn->connect_error);
-        }
-
-        // Récupérer uniquement les avis approuvés
-        $sql = "SELECT pseudo, avis FROM avis_visiteurs WHERE statut = 'approuve' ORDER BY id DESC";
-        $result = $conn->query($sql);
-
-        if ($result->num_rows > 0) {
-            echo '<div class="carousel-inner">';
-            while ($comment = $result->fetch_assoc()) {
-                echo '<div class="comment">';
-                echo '<strong>' . htmlspecialchars($comment['pseudo']) . '</strong>: ' . htmlspecialchars($comment['avis']);
-                echo '</div>';
-            }
-            echo '</div>';
-        } else {
-            echo "<p>Aucun avis approuvé pour le moment.</p>";
-        }
-
-        // Fermer la connexion
-        $conn->close();
-        ?>
-    </div>
-</div>
-
-            </div>
-        </div>
-    </div>
-</section>
-<!--contact-->
-<section id="contact">
-    <h2>Contactez-nous</h2>
-    <form action="send_contact.php" method="post">
-        <label for="title">Titre:</label>
-        <input type="text" id="title" name="title" required>
-
-        <label for="description">Description:</label>
-        <textarea id="description" name="description" rows="5" required></textarea>
-
-        <label for="email">Votre Email:</label>
-        <input type="email" id="email" name="email" required>
-
-        <button type="submit" class="btn-medium" >Envoyer</button>
-    </form>
-</section>
- <!-- footer -->
-
- <section class="footer">
-    <div class="box-container">
-      <div class="box">
-        <h3><i class="fas fa-paw"></i> zoo Arcadia</h3>
-  <p>Nos Horaires.</p>
-        <p class="links"><i class="fas fa-clock"></i>lundi- Dimanche</p>
-        <p class="days">8:00AM - 21:00PM</p>
-      </div>
-
-      <div class="box">
-        <h3>Nos contacts</h3>
-        <a href="#" class="links"
-          ><i class="fas fa-phone"></i> 01.22.44.55.20</a>
-        <a href="#" class="links"
-          ><i class="fas fa-envelope"></i> info@zooArcadia.com</a>
-        <a href="#" class="links"
-          ><i class="fas fa-map-marker-alt"></i>Brocélionde,Bretagne</a >
-      </div>
-
-      
-      <div class="box">
-        <h3>Arcadia carte</h3 >
-   </script>
-   <iframe src="https://www.google.com/maps/d/embed?mid=1RMFibnDTskUEdjpGRdaZxDwle3AvHWo&ehbc=2E312F"
-    width="400" height="280"></iframe>
-      </div>
-    </div>
-
-    <div class="credit">
-      &copy; 2024 zoo Arcadia. 
-     
-    </div>
-  </section>
-   
-   </script>
-<script src="assets/script.js" defer></script>     
-    </body>
+    <!-- Script -->
+    <script src="assets/script.js" defer></script>
+</body>
 </html>
+

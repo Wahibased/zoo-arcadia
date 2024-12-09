@@ -1,21 +1,28 @@
 <?php
-header("Content-Type: application/json");
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-$mongo = new MongoDB\Client("mongodb://localhost:27017");
-$db = $mongo->zoo_arcadia;
+$pdo = new PDO("mysql:host=localhost;dbname=zoo_arcadia", "root", "");
 
-// Récupérer le nom de l'animal à incrémenter
-$data = json_decode(file_get_contents('php://input'), true);
-$animal = $data['animal'] ?? null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['animalId'])) {
+    $animalId = (int) $_POST['animalId'];
+    var_dump($animalId); // Debugging: Vérifiez si l'ID de l'animal est correct
 
-if ($animal) {
-    // Incrémenter le compteur
-    $result = $db->habitat_consultations->updateOne(
-        ['_id' => $animal],
-        ['$inc' => ['totalConsultations' => 1]],
-        ['upsert' => true]
-    );
-    echo json_encode(['success' => true]);
+    $stmt = $pdo->prepare("UPDATE animaux SET consultation_count = consultation_count + 1 WHERE id = ?");
+    if ($stmt->execute([$animalId])) {
+        $stmt = $pdo->prepare("SELECT consultation_count FROM animaux WHERE id = ?");
+        $stmt->execute([$animalId]);
+        $newCount = $stmt->fetchColumn();
+
+        var_dump($newCount); // Debugging: Vérifiez la nouvelle valeur du compteur
+
+        echo json_encode(['success' => true, 'newCount' => $newCount]);
+    } else {
+        echo json_encode(['success' => false, 'error' => 'Failed to update consultation count']);
+    }
 } else {
-    echo json_encode(['error' => 'Animal non spécifié']);
+    echo json_encode(['success' => false, 'error' => 'Invalid request']);
 }
+
+
