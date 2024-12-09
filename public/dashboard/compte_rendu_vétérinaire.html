@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire de Compte Rendu Vétérinaire</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Compte Rendu Vétérinaire</h1>
+    </header>
+
+    <main>
+        <form id="veterinary_reports" method="POST"  action="/dashboard/submit_reports.php">
+            <!-- Sélection de l'Animal -->
+            <label for="animal">Sélectionnez un animal :</label>
+            <select name="animal" id="animal" required>
+                <option value="Flamant rose">Flamant rose (Phoenicopterus roseus)</option>
+                <option value="Alligator">Alligator américain (Alligator mississippiensis)</option>
+                <option value="Aigrette">Aigrette (Ardea alba)</option>
+                <option value="Lion africain">Lion africain (Panthera leo)</option>
+                <option value="Buffle">Buffle d'Afrique (Syncerus caffer)</option>
+                <option value="Girafe">Girafe réticulée (Giraffa reticulata)</option>
+                <option value="Oryx">Oryx gazelle (Oryx gazella)</option>
+                <option value="Suricate">Suricate commun (Suricata suricatta)</option>
+                <option value="Zèbre">Zèbre des plaines (Equus quagga)</option>
+                <option value="Singe">Singe (Anole vert, Anolis carolinensis)</option>
+                <option value="Lézard">Lézard (Anole vert, Anolis carolinensis)</option>
+                <option value="Tigre">Tigre du Bengale (Panthera tigris tigris)</option>
+                <option value="Toucan">Toucan toco (Ramphastos toco)</option>
+                <option value="Python">Python réticulé (Malayopython reticulatus)</option>
+            </select>
+         
+            <!-- Date de Passage -->
+            <label for="date">Date de passage :</label>
+            <input type="date" id="date" name="date" required>
+
+            <!-- État de l'Animal -->
+            <label for="etat">État de l'animal :</label>
+            <textarea id="etat" name="etat" rows="3" placeholder="Décrivez l'état de l'animal..." required></textarea>
+
+            <!-- Nourriture Proposée -->
+            <label for="nourriture">Nourriture proposée :</label>
+            <input type="text" id="nourriture" name="nourriture" placeholder="Type de nourriture" required>
+
+            <!-- Grammage de la Nourriture -->
+            <label for="grammage">Grammage de la nourriture (en grammes) :</label>
+            <input type="number" id="grammage" name="grammage" min="0" required>
+
+            <!-- Avis du Vétérinaire -->
+            <label for="avis">Avis du vétérinaire :</label>
+            <textarea id="avis" name="avis" rows="4" placeholder="Donnez votre avis professionnel..." required></textarea>
+
+       <!-- Bouton de Soumission -->
+            <button type="submit">Enregistrer le Compte Rendu</button>
+        </form>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Zoo Arcadia. Tous droits réservés.</p>
+    </footer>
+
+    <script>
+        document.getElementById('veterinary_reports').addEventListener('submit', function (e) {
+            let errors = [];
+            const date = document.getElementById('date').value;
+            const grammage = document.getElementById('grammage').value;
+            const etat = document.getElementById('etat').value;
+        
+            if (!date) {
+                errors.push("Veuillez sélectionner une date.");
+            }
+            if (grammage <= 0) {
+                errors.push("Le grammage doit être supérieur à 0.");
+            }
+            if (etat.trim() === '') {
+                errors.push("Veuillez décrire l'état de l'animal.");
+            }
+        
+            if (errors.length > 0) {
+                e.preventDefault();
+                alert(errors.join('\n'));
+            }
+        });
+        </script>
+           
+  </body>
+</html>
+
