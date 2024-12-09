@@ -223,7 +223,7 @@ footer p {
 </body>
 </html>
 
-<!-- Ceci est un commentaire
+
     <main>
         <section id="restauration">
             <h2>Restauration</h2>
@@ -239,7 +239,7 @@ footer p {
                             </div>
                         </div>
                     <?php endif; ?>
-                <?php endforeach; ?>
+                <?php endforeach; ?> 
             </div>
         </section>
 
@@ -277,7 +277,7 @@ footer p {
             </div>
         </section>
     </main>
-    -->
+
     <footer>
         <p>&copy; 2024 Zoo Arcadia. Tous droits réservés.</p>
     </footer>

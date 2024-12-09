@@ -47,26 +47,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     http_response_code(405);
     echo "Méthode non autorisée.";
 }
-<script>
-        document.getElementById('veterinary_reports').addEventListener('submit', function (e) {
-            let errors = [];
-            const date = document.getElementById('date').value;
-            const grammage = document.getElementById('grammage').value;
-            const etat = document.getElementById('etat').value;
-        
-            if (!date) {
-                errors.push("Veuillez sélectionner une date.");
-            }
-            if (grammage <= 0) {
-                errors.push("Le grammage doit être supérieur à 0.");
-            }
-            if (etat.trim() === '') {
-                errors.push("Veuillez décrire l'état de l'animal.");
-            }
-        
-            if (errors.length > 0) {
-                e.preventDefault();
-                alert(errors.join('\n'));
-            }
-        });
-        </script>
