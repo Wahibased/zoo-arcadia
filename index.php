@@ -1,3 +1,7 @@
+<?php
+// Démarrer la session au début du fichier
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -12,7 +16,9 @@
     <link rel="stylesheet" href="">
     
     <title>Zoo Arcadia</title>
+
 </head>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap');
 
