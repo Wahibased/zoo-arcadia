@@ -3,11 +3,11 @@
 // Définir la connexion MySQL à partir de JAWSDB_URL
 $url = parse_url("mysql://p7jr3mcbsyvbcllf:ycrgx4akgsl5u0z6@alv4v3hlsipxnujn.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/jch6tgw1mw5gns41");
 
-$host = $url["host"];         // hôte de la base
-$username = $url["user"];     // nom d'utilisateur
-$password = $url["pass"];     // mot de passe
+$host = $url["host"];         
+$username = $url["user"];    
+$password = $url["pass"];     
 $dbname = substr($url["path"], 1); // nom de la base de données
-$port = $url["port"];         // port (3306)
+$port = $url["port"];       
 
 // Connexion à MySQL avec PDO
 try {
