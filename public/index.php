@@ -2,8 +2,31 @@
 // Démarrer la session au début du fichier
 session_start();
 
-// Inclusion d'une bibliothèque pour la gestion des requêtes sécurisées (si nécessaire)
-require_once(__DIR__ . '/config/db.php');
+// Paramètres de connexion à la base de données
+$host = 'alv4v3hlsipxnujn.cbetxkdyhwsb.us-east-1.rds.amazonaws.com';
+$dbname = 'jch6tgw1mw5gns41';
+$username = 'p7jr3mcbsyvbcllf';
+$password = 'ycrgx4akgsl5u0z6';
+$port = 3306;
+
+// DSN (Data Source Name) pour la connexion PDO
+$dsn = "mysql:host=$host;dbname=$dbname;port=$port";
+
+// Tentative de connexion à la base de données avec gestion d'erreur
+try {
+    // Créer une nouvelle instance PDO
+    $pdo = new PDO($dsn, $username, $password);
+    
+    // Définir l'attribut pour la gestion des erreurs PDO
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
+    // Si la connexion réussit, afficher un message (facultatif)
+    // echo "Connexion réussie à la base de données !";
+} catch (PDOException $e) {
+    // En cas d'erreur de connexion, afficher un message d'erreur
+    die("Erreur de connexion à la base de données : " . $e->getMessage());
+}
+
  // Assurez-vous d'avoir un fichier de connexion à la base de données.
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -27,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Connexion réussie
             $_SESSION['user'] = $user;
             $_SESSION['success'] = 'Connexion réussie.';
-            header('Location: dashboard.php'); // Rediriger vers une page protégée
+            header('Location: login.php'); // Rediriger vers une page protégée
             exit;
         } else {
             // Informations d'identification incorrectes
